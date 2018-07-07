@@ -1,0 +1,136 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Flight;
+use Illuminate\Http\Request;
+
+class FlightController extends Controller
+{
+    /**
+     * Return all the flights stored in the database
+     *
+     * @return array
+     */
+    public function getAllFlights()
+    {
+        if (count($flights = Flight::getAllFlights()) > 0) {
+            $flightsTweak = [];
+            foreach ($flights as $flight) {
+                $flightsTweak[] = [
+                    'id' => $flight->id,
+                    'from' => $flight->from_airport->name,
+                    'to' => $flight->to_airport->name,
+                    'plane' => $flight->plane->name,
+                    'date_departure' => $flight->date_departure,
+                    'date_arrival' => $flight->date_arrival,
+                    'airline' => $flight->airline->name
+                ];
+            }
+
+            return ['error' => false, 'result' => $flightsTweak];
+        } else {
+            return ['error' => true, 'message' => "No flights found"];
+        }
+    }
+
+    /**
+     * Finding all the flight from a specific airline
+     *
+     * @param Request $request
+     * @return array
+     */
+    public function findFlightByAirline(Request $request)
+    {
+        if (count($flight = Flight::getFlightByAirline($request->airline_id)) > 0) {
+            return ['error' => false, 'result' => $flight];
+        } else {
+            return ['error' => true, 'message' => 'We could not find any flight with that airline'];
+        }
+    }
+
+    /**
+     * Inserting a new Flight
+     *
+     * @param Request $request
+     * @return array
+     */
+    public function addANewFlight(Request $request)
+    {
+        //Parameters required to add a flight
+        $parameters = [
+            'departure' => 'int',
+            'arrival' => 'int',
+            'plane_id' => 'int',
+            'date_departure' => 'timestamp',
+            'date_arrival' => 'timestamp',
+            'airline_id' => 'int'
+        ];
+
+        $errors = [];
+        foreach ($parameters as $key => $value) {
+            switch ($value) {
+                case "int":
+                    //If the value isn't a number or isn't greater than 0
+                    if (!is_numeric($request->{$key}) || !$request->{$key} > 0) {
+                        $errors[] = "The variable {$key} must be a number and must be greater than 0";
+                    }
+                    break;
+                case "timestamp":
+                    //Convert timestamp to date
+                    $request->{$key} = date('Y-m-d H:i:s', $request->{$key});
+                case "date":
+                    //Validating the date
+                    if (!Flight::validateDate($request->{$key})) {
+                        $errors[] = "The variable {$key} does not have a correct date format [{$request->{$key}}]";
+                    }
+                    break;
+                default:
+                    //Check to make sure the value is not null or it will error out
+                    if (is_null($request->{$key})) {
+                        $errors[] = "You can not submit empty value. Make sure you have all the parameter required.";
+                    }
+            }
+        }
+
+        $flight = [];
+        foreach ($parameters as $key => $value) {
+            if ($value == "int") {
+                $flight[$key] = (int)$request->{$key};
+            } else {
+                $flight[$key] = $request->{$key};
+            }
+
+        }
+
+        //Making sure there's no error
+        if (count($errors) == 0 && Flight::insertFlight($flight)) {
+            return ['error' => false, 'message' => 'Your flight have been added!'];
+        } else {
+            return ['error' => true, 'message' => $errors];
+        }
+    }
+
+    /**
+     * Delete a flight by ID
+     *
+     * @param Request $request
+     * @return array
+     */
+    public function deleteFlightByID(Request $request) {
+        if (is_numeric($id = $request->id)) {
+            if(count($flight = Flight::find($id) > 0)){
+                if($flight->delete()){
+                   return ['error' =>false, 'message' => 'Flight have been deleted!'];
+                } else {
+                    return ['error' => true, 'message' => 'We could not delete the flight. Please try again.'];
+                }
+            } else {
+                return ['error' => true, 'message' => 'No flight found'];
+            }
+        } else {
+            return ['error' => true, 'message' => 'The value must be numeric'];
+        }
+    }
+
+}

@@ -1,0 +1,63 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Airport;
+use Illuminate\Http\Request;
+
+class AirportController extends Controller
+{
+    /**
+     * Return a message asking for more parameter
+     * @return array
+     */
+    public function getIndex()
+    {
+        return ['error' => true, 'message' => 'You are required to have more parameter for us to return useful data'];
+    }
+
+    /**
+     * Return all the airport containing the name asked
+     * @param Request $request
+     * @return array
+     */
+    public function getLikeNameAirport(Request $request)
+    {
+        if (count($airports = Airport::getAllAirportWithName($request->name)) > 0) {
+            return ['error' => false, 'result' => $airports];
+        } else {
+            return ['error' => true, 'message' => 'We could not find any airport name containing' . $request->name];
+        }
+
+    }
+
+    /**
+     * Return all te airport from a specific country
+     * @param Request $request
+     * @return array
+     */
+    public function getLikeCountryAirport(Request $request)
+    {
+        if (count($airports = Airport::getAllAirportWithCountry($request->country)) > 0) {
+            return ['error' => false, 'result' => $airports];
+        } else {
+            return ['error' => true, 'message' => 'We could not find any airport name containing' . $request->country];
+        }
+
+    }
+
+    /**
+     * Return all the airport that we have in a alphabetical order
+     * @return array
+     */
+    public function getAllAirport()
+    {
+        if (count($airport = Airport::getAllAirport()) > 0) {
+            return ['error' => false, 'result' => $airport];
+        } else {
+            return ['error' => true, 'message' => 'We could not find any airport'];
+        }
+
+    }
+}
+
