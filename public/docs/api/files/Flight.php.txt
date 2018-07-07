@@ -112,9 +112,10 @@ class Flight extends Model
      * @param $airline_id
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public static function getFlightByAirline($airline_id){
+    public static function getFlightByAirline($airline_id)
+    {
         return Flight::query()
-            ->where('airline_id', '=',$airline_id)
+            ->where('airline_id', '=', $airline_id)
             ->get();
     }
 }

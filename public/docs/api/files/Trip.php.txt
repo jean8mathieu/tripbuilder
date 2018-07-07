@@ -32,7 +32,8 @@ class Trip extends Model
      * @param $parameters
      * @return bool
      */
-    public static function insertTrip($parameters){
+    public static function insertTrip($parameters)
+    {
         $trip = new Trip();
 
         foreach ($parameters as $key => $value) {
@@ -48,7 +49,8 @@ class Trip extends Model
      * @param $id
      * @return \Illuminate\Database\Eloquent\Collection|Model|null|static|static[]
      */
-    public static function getTripByID($id){
+    public static function getTripByID($id)
+    {
         return Trip::find($id);
     }
 
@@ -57,7 +59,8 @@ class Trip extends Model
      *
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public static function getAllTrips(){
+    public static function getAllTrips()
+    {
         return Trip::query()->get();
     }
 
@@ -77,10 +80,11 @@ class Trip extends Model
      * @param $id
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public static function getFlightByTripID($id){
-        if(count($trip = Trip::find($id)) > 0)
+    public static function getFlightByTripID($id)
+    {
+        if (count($trip = Trip::find($id)) > 0)
             return $trip->flight()->get();
-         return Trip::find($id);
+        return Trip::find($id);
     }
 
 }

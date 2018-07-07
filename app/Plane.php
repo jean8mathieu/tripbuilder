@@ -24,4 +24,29 @@ class Plane extends Model
         'short_name_2',
         'max_passenger',
     ];
+
+    /**
+     * Return all planes
+     *
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public static function getAllPlanes(){
+        return Plane::query()->get(
+            ['id', 'name', 'short_name_1', 'short_name_2', 'max_passenger']
+        );
+    }
+
+    /**
+     * Return all plane by minimum passenger
+     *
+     * @param $amount
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public static function getPlaneByMinimumPassenger($amount){
+        return Plane::query()
+            ->where('max_passenger', '>=', $amount)
+            ->get(
+                ['id', 'name', 'short_name_1', 'short_name_2', 'max_passenger']
+            );
+    }
 }

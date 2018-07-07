@@ -14,13 +14,11 @@ class PlaneController extends Controller
      */
     public function getAllPlanes()
     {
-        return [
-            'error' => false,
-            'result' =>
-                Plane::query()->get(
-                    ['id', 'name', 'short_name_1', 'short_name_2', 'max_passenger']
-                )
-        ];
+        if(count($planes = Plane::getAllPlanes()) > 0) {
+            return ['error' => false, 'result' => $planes];
+        } else {
+            return ['error' => true, 'message' => 'No plane was found'];
+        }
     }
 
     /**
@@ -31,15 +29,11 @@ class PlaneController extends Controller
      */
     public function getPlaneByMinimumPassenger(Request $request)
     {
-        return [
-            'error' => false,
-            'result' =>
-                Plane::query()
-                    ->where('max_passenger', '>=', $request->amount)
-                    ->get(
-                        ['id', 'name', 'short_name_1', 'short_name_2', 'max_passenger']
-                    )
-        ];
+        if(is_numeric($request->amount) && count($planes = Plane::getPlaneByMinimumPassenger($request->amount))) {
+            return ['error' => false, 'result' => $planes];
+        } else {
+            return ['error' => true, 'message' => 'No plane was found'];
+        }
     }
 }
 
